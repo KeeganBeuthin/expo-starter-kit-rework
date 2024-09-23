@@ -3,7 +3,7 @@ import { makeRedirectUri, AuthRequest, exchangeCodeAsync } from 'expo-auth-sessi
 import { openAuthSessionAsync, maybeCompleteAuthSession } from "expo-web-browser";
 import { Button, Text, View } from 'react-native';
 import Constants from "expo-constants";
-import { ExpoSecureStore, mapLoginMethodParamsForUrl, StorageKeys } from '@kinde/js-utils';
+import { ExpoSecureStore, mapLoginMethodParamsForUrl, StorageKeys, getClaims, setActiveStorage } from '@kinde/js-utils';
 import React from 'react';
 
 maybeCompleteAuthSession();
@@ -20,6 +20,7 @@ export default function App() {
     });
 
   const store: ExpoSecureStore = new ExpoSecureStore();
+  setActiveStorage(store);
 
   const authenticate = async (
     options = {},
@@ -62,6 +63,8 @@ export default function App() {
         setCode(exchangeCodeResponse.accessToken)
    
         await store.setSessionItem(StorageKeys.accessToken, exchangeCodeResponse.accessToken);
+
+        console.log(await getClaims());
 
         return {
           success: true,
