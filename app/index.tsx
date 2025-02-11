@@ -3,17 +3,19 @@ import { makeRedirectUri, AuthRequest, exchangeCodeAsync } from 'expo-auth-sessi
 import { openAuthSessionAsync, maybeCompleteAuthSession } from "expo-web-browser";
 import { Button, Text, View } from 'react-native';
 import Constants from "expo-constants";
-import { ExpoSecureStore, mapLoginMethodParamsForUrl, StorageKeys, getClaims, setActiveStorage } from '@kinde/js-utils';
+import { ExpoSecureStore, mapLoginMethodParamsForUrl, StorageKeys, getClaims, setActiveStorage, setRefreshTimer, refreshToken } from '@kinde/js-utils';
 import React from 'react';
 
 maybeCompleteAuthSession();
 
-const domain = process.env.EXPO_PUBLIC_KINDE_DOMAIN
+const KINDE_DOMAIN = 'http://[yourdomain].kinde.com';
+const KINDE_REDIRECT_URL = '';
+const KINDE_CLIENT_ID = ''
 
 export default function App() {
   const [code, setCode] = useState<string | null>('');
   const redirectUri =
-    process.env.EXPO_PUBLIC_KINDE_REDIRECT_URL ||
+  KINDE_REDIRECT_URL ||
     makeRedirectUri({
       native: Constants.isDevice,
       path: "kinde_callback",
@@ -25,8 +27,17 @@ export default function App() {
   const authenticate = async (
     options = {},
   ) => {
+
+    // check if there is already a session
+    const accessToken = await store.getSessionItem(StorageKeys.accessToken);
+    
+    // valdate the token using validation library e.g. @kinde-oss/jwt-validator
+    // if the token is valid, the user is already logged in and can continue. 
+    // recommended to start the refresh timer, see example in exchangeCodeAsync callback below
+
+
     const request = new AuthRequest({
-      clientId: process.env.EXPO_PUBLIC_KINDE_CLIENT_ID!,
+      clientId: KINDE_CLIENT_ID,
       redirectUri,
       scopes: ['openid','profile','email','offline'],
       responseType: "code",
@@ -39,7 +50,7 @@ export default function App() {
     try {
       const codeResponse = await request.promptAsync(
         {
-          authorizationEndpoint: `${domain}/oauth2/auth`,
+          authorizationEndpoint: `${KINDE_DOMAIN}/oauth2/auth`,
         },
         {
           showInRecents: true,
@@ -49,7 +60,7 @@ export default function App() {
       if (request && codeResponse?.type === "success") {
         const exchangeCodeResponse = await exchangeCodeAsync(
           {
-            clientId: process.env.EXPO_PUBLIC_KINDE_CLIENT_ID!,
+            clientId: KINDE_CLIENT_ID!,
             code: codeResponse.params.code,
             extraParams: request.codeVerifier
               ? { code_verifier: request.codeVerifier }
@@ -57,7 +68,7 @@ export default function App() {
             redirectUri,
           },
           {
-            tokenEndpoint: `${domain}/oauth2/token`,
+            tokenEndpoint: `${KINDE_DOMAIN}/oauth2/token`,
           },
         );
         setCode(exchangeCodeResponse.accessToken)
@@ -65,6 +76,20 @@ export default function App() {
         await store.setSessionItem(StorageKeys.accessToken, exchangeCodeResponse.accessToken);
 
         console.log(await getClaims());
+
+        // Sets the refresh token in the secure store.
+        store.setSessionItem(
+          StorageKeys.refreshToken,
+          exchangeCodeResponse.refreshToken,
+        );
+
+        // This will start the token refresh, triggering the access and refresh tokens to be refreshed 10 seconds before the access token expires.
+        setRefreshTimer(exchangeCodeResponse.expiresIn!, async () => {
+          refreshToken({
+            domain: KINDE_DOMAIN,
+            clientId: KINDE_CLIENT_ID,
+          });
+        });
 
         return {
           success: true,
@@ -107,7 +132,7 @@ export default function App() {
       <Button
         title="Logout"
         onPress={async() => {
-          await openAuthSessionAsync(`${domain}/logout?redirect=${redirectUri}`);
+          await openAuthSessionAsync(`${KINDE_DOMAIN}/logout?redirect=${redirectUri}`);
         }}
       />
     </View>
