@@ -5,7 +5,7 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 import { useKindeAuth } from '@kinde/expo';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
@@ -18,7 +18,6 @@ export default function HomeScreen() {
   useEffect(() => {
     setIsAuth(kinde.isAuthenticated);
     
-    // Redirect to dashboard if already authenticated
     if (kinde.isAuthenticated) {
       router.replace('/dashboard');
     }
@@ -29,64 +28,61 @@ export default function HomeScreen() {
       style={styles.scrollView} 
       contentContainerStyle={styles.scrollContent}
     >
-      <ThemedView style={[styles.container, { paddingBottom: insets.bottom + 20 }]}>
+      <View style={styles.container}>
         <ThemedText style={styles.mainHeading}>
           Auth for{'\n'}modern{'\n'}applications
         </ThemedText>
         
-        <ThemedView style={styles.instructionsContainer}>
-          <ThemedView style={styles.firstThingsFirst}>
-            <ThemedText style={styles.firstThingsFirstText}>
-              First things first
-            </ThemedText>
-          </ThemedView>
+        <View style={styles.labelContainer}>
+          <ThemedText style={styles.label}>
+            First things first
+          </ThemedText>
+        </View>
+        
+        {/* Card 1 */}
+        <View style={styles.card}>
+          <View style={styles.cardHeader}>
+            <View style={styles.stepBadge}>
+              <ThemedText style={styles.stepBadgeText}>1</ThemedText>
+            </View>
+            <ThemedText style={styles.cardTitle}>Instructions</ThemedText>
+          </View>
           
-          <ThemedView style={styles.card}>
-            <ThemedView style={styles.stepHeader}>
-              <ThemedView style={styles.stepNumber}>
-                <ThemedText style={styles.stepNumberText}>1</ThemedText>
-              </ThemedView>
-            </ThemedView>
-            
-            <ThemedView style={styles.stepContent}>
-              <ThemedText style={styles.stepText}>
-                A. In Kinde, go to <ThemedText style={styles.boldText}>Settings {'>'} Applications {'>'} [Your app] {'>'} View details</ThemedText>.
-              </ThemedText>
-              
-              <ThemedText style={styles.stepText}>
-                B. Add your <ThemedText style={styles.boldText}>callback URLs</ThemedText> in the relevant fields. For example:
-              </ThemedText>
-              
-              <ThemedView style={styles.codeBlock}>
-                <ThemedText style={styles.codeText}>exp://localhost:8081/--/</ThemedText>
-                <ThemedText style={styles.codeText}>exp://192.168.X.X:8081/--/</ThemedText>
-              </ThemedView>
-              
-              <ThemedView style={styles.codeBlock}>
-                <ThemedText style={styles.codeText}>exp://localhost:8081</ThemedText>
-                <ThemedText style={styles.codeText}>exp://192.168.X.X:8081</ThemedText>
-              </ThemedView>
-              
-              <ThemedText style={styles.stepText}>
-                C. Select <ThemedText style={styles.boldText}>Save</ThemedText>.
-              </ThemedText>
-            </ThemedView>
-          </ThemedView>
+          <ThemedText style={styles.cardText}>
+            A. In Kinde, go to <ThemedText style={styles.boldText}>Applications {'>'} [Your app] {'>'} View details</ThemedText>.
+          </ThemedText>
           
-          <ThemedView style={styles.card}>
-            <ThemedView style={styles.stepHeader}>
-              <ThemedView style={styles.stepNumber}>
-                <ThemedText style={styles.stepNumberText}>2</ThemedText>
-              </ThemedView>
-              <ThemedText style={styles.stepTitle}>Get building!</ThemedText>
-            </ThemedView>
-            
-            <ThemedView style={styles.authContainer}>
-              <Auth />
-            </ThemedView>
-          </ThemedView>
-        </ThemedView>
-      </ThemedView>
+          <ThemedText style={styles.cardText}>
+            B. Add your <ThemedText style={styles.boldText}>callback URLs</ThemedText> in the relevant fields. For example:
+          </ThemedText>
+          
+          <View style={styles.codeBlock}>
+            <ThemedText style={styles.codeText}>exp://localhost:8081/--/</ThemedText>
+            <ThemedText style={styles.codeText}>exp://192.168.X.X:8081/--/</ThemedText>
+          </View>
+          
+          <View style={styles.codeBlock}>
+            <ThemedText style={styles.codeText}>exp://localhost:8081</ThemedText>
+            <ThemedText style={styles.codeText}>exp://192.168.X.X:8081</ThemedText>
+          </View>
+          
+          <ThemedText style={styles.cardText}>
+            C. Select <ThemedText style={styles.boldText}>Save</ThemedText>.
+          </ThemedText>
+        </View>
+        
+        {/* Card 2 */}
+        <View style={styles.card}>
+          <View style={styles.cardHeader}>
+            <View style={styles.stepBadge}>
+              <ThemedText style={styles.stepBadgeText}>2</ThemedText>
+            </View>
+            <ThemedText style={styles.cardTitle}>Get building!</ThemedText>
+          </View>
+          
+          <Auth />
+        </View>
+      </View>
     </ScrollView>
   );
 }
@@ -97,12 +93,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
   },
   scrollContent: {
-    flexGrow: 1,
+    paddingTop: 50,
+    paddingBottom: 40,
   },
   container: {
-    flex: 1,
     padding: 16,
-    alignItems: 'center',
     backgroundColor: 'black',
   },
   mainHeading: {
@@ -110,66 +105,58 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: 'white',
     textAlign: 'center',
-    marginTop: 30,
     marginBottom: 40,
     lineHeight: 42,
   },
-  instructionsContainer: {
-    width: '100%',
-    gap: 12,
-  },
-  firstThingsFirst: {
+  labelContainer: {
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 20,
   },
-  firstThingsFirstText: {
+  label: {
     fontSize: 14,
     color: 'black',
     backgroundColor: '#f1f5f9',
     paddingVertical: 6,
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
     borderRadius: 20,
   },
   card: {
+    width: '100%',
     borderWidth: 1,
     borderColor: '#262626',
     borderRadius: 12,
     backgroundColor: 'white',
-    overflow: 'hidden',
-    marginBottom: 16,
+    padding: 16,
+    marginBottom: 20,
   },
-  stepHeader: {
+  cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingTop: 16,
+    marginBottom: 16,
   },
-  stepNumber: {
+  stepBadge: {
     width: 28,
     height: 28,
     borderRadius: 14,
     backgroundColor: 'black',
     justifyContent: 'center',
     alignItems: 'center',
+    marginRight: 8,
   },
-  stepNumberText: {
+  stepBadgeText: {
     color: 'white',
     fontWeight: '600',
     fontSize: 14,
   },
-  stepTitle: {
-    color: 'black',
-    fontSize: 16,
+  cardTitle: {
+    fontSize: 18,
     fontWeight: '600',
-    marginLeft: 8,
+    color: 'black',
   },
-  stepContent: {
-    padding: 16,
-  },
-  stepText: {
-    color: '#64748b',
-    marginBottom: 16,
+  cardText: {
     fontSize: 14,
+    color: '#64748b',
+    marginBottom: 12,
   },
   boldText: {
     fontWeight: '600',
@@ -179,14 +166,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#111827',
     padding: 16,
     borderRadius: 8,
-    marginBottom: 16,
+    marginBottom: 12,
   },
   codeText: {
     fontFamily: 'monospace',
     color: '#e2e8f0',
     fontSize: 14,
-  },
-  authContainer: {
-    padding: 16,
   }
 });
