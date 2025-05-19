@@ -68,7 +68,7 @@ export function UserProfile({ showTitle = false }: UserProfileProps) {
               <Text style={styles.fieldLabelText}>email</Text>
             </View>
             <View style={[styles.fieldValue, isDark && styles.fieldValueDark]}>
-              <Text style={[styles.fieldValueText, isDark && styles.textDark]} numberOfLines={1}>{user.email}</Text>
+              <Text style={[styles.fieldValueText, isDark && styles.textDark]} numberOfLines={1}>{user.email ?? '—'}</Text>
             </View>
           </View>
           
@@ -78,7 +78,7 @@ export function UserProfile({ showTitle = false }: UserProfileProps) {
             </View>
             <View style={[styles.fieldValue, isDark && styles.fieldValueDark]}>
               <Text style={[styles.fieldValueText, isDark && styles.textDark]} numberOfLines={1}>
-                {user.given_name} {user.family_name}
+                {[user.given_name, user.family_name].filter(Boolean).join(' ') || '—'}
               </Text>
             </View>
           </View>

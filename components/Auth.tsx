@@ -11,7 +11,7 @@ export function Auth() {
     try {
       const token = await kinde.login({});
       if (token) {
-        console.log('User signed in successfully', token);
+        console.log('User signed in successfully');
         router.replace('/dashboard');
       }
     } catch (error) {
@@ -23,7 +23,7 @@ export function Auth() {
     try {
       const token = await kinde.register({});
       if (token) {
-        console.log('User registered successfully', token);
+        console.log('User registered successfully');
         router.replace('/dashboard');
       }
     } catch (error) {

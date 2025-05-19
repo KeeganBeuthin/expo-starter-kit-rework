@@ -6,7 +6,7 @@ import {
     getUserProfile
 } from '@kinde/expo/utils';
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, useColorScheme, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, useColorScheme, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface UserProfile {
@@ -41,30 +41,55 @@ export default function ProfileScreen() {
   const [permissions, setPermissions] = useState<Permission[]>([]);
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const [profile, userRoles, userPermissions, currentOrg] = await Promise.all([
-          getUserProfile(),
-          getRoles(),
-          getPermissions(),
-          getCurrentOrganization()
-        ]);
+  const fetchUserData = async () => {
+    try {
+      const [profile, userRoles, permissionCodes, orgCode] = await Promise.all([
+        getUserProfile(),
+        getRoles(),
+        getPermissions(),
+        getCurrentOrganization()
+      ]);
 
-        setUserProfile(profile as UserProfile);
-        setRoles(userRoles as Role[] || []);
-        setPermissions(userPermissions as unknown as Permission[] || []);
-        setOrganization(currentOrg as unknown as Organization);
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      } finally {
-        setLoading(false);
+      setUserProfile(profile as UserProfile);
+      setRoles(userRoles as Role[] || []);
+      
+
+      const permissionArray = permissionCodes 
+        ? (Array.isArray(permissionCodes) 
+            ? permissionCodes 
+            : Object.keys(permissionCodes as Record<string, unknown>))
+        : [];
+      
+
+      setPermissions(
+        permissionArray.map((code: string) => ({ 
+          id: code, 
+          name: code 
+        }))
+      );
+      
+
+      if (orgCode) {
+        setOrganization({ 
+          id: typeof orgCode === 'string' ? orgCode : String(orgCode), 
+          name: typeof orgCode === 'string' ? orgCode : String(orgCode) 
+        });
+      } else {
+        setOrganization(null);
       }
-    };
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      setError('Failed to load profile data. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchUserData();
   }, []);
 
@@ -72,6 +97,23 @@ export default function ProfileScreen() {
     return (
       <SafeAreaView style={[styles.container, isDark && styles.containerDark]}>
         <Text style={[styles.loadingText, isDark && styles.textDark]}>Loading profile data...</Text>
+      </SafeAreaView>
+    );
+  }
+
+  if (error) {
+    return (
+      <SafeAreaView style={[styles.container, isDark && styles.containerDark]}>
+        <Text style={[styles.errorText, isDark && styles.textDark]}>{error}</Text>
+        <Pressable 
+          style={[styles.retryButton, isDark && styles.retryButtonDark]}
+          onPress={() => {
+            setError(null);
+            setLoading(true);
+            fetchUserData();
+          }}>
+          <Text style={[styles.retryButtonText, isDark && styles.textDark]}>Retry</Text>
+        </Pressable>
       </SafeAreaView>
     );
   }
@@ -250,5 +292,26 @@ const styles = StyleSheet.create({
   },
   textDark: {
     color: '#fff',
+  },
+  errorText: {
+    textAlign: 'center',
+    marginTop: 40,
+    fontSize: 16,
+    color: '#ef4444',
+  },
+  retryButton: {
+    marginTop: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    backgroundColor: '#3b82f6', 
+    alignSelf: 'center',
+  },
+  retryButtonDark: {
+    backgroundColor: '#60a5fa',
+  },
+  retryButtonText: {
+    color: '#fff',
+    fontWeight: '600',
   },
 });

@@ -31,19 +31,21 @@ interface ContentItem {
 export default function DashboardScreen({ navigation }: DashboardScreenProps) {
   const { isAuthenticated } = useKindeAuth();
   const [user, setUser] = useState<UserProfile | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
 
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const profile = await getUserProfile();
-        setUser(profile as UserProfile);
-      } catch (error) {
-        console.error('Error fetching user profile:', error);
-      }
-    };
+  const fetchUserProfile = async () => {
+    try {
+      const profile = await getUserProfile();
+      setUser(profile as UserProfile);
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+      setError('Failed to load profile. Please try again.');
+    }
+  };
 
+  useEffect(() => {
     if (isAuthenticated) {
       fetchUserProfile();
     }
@@ -66,7 +68,21 @@ export default function DashboardScreen({ navigation }: DashboardScreenProps) {
             Your authentication is all sorted!
           </Text>
           
-          {isAuthenticated && user ? (
+          {error && (
+            <View style={styles.errorContainer}>
+              <Text style={[styles.errorText, isDark && styles.errorTextDark]}>{error}</Text>
+              <Pressable
+                style={[styles.retryButton, isDark && styles.retryButtonDark]}
+                onPress={() => {
+                  setError(null);
+                  fetchUserProfile();
+                }}>
+                <Text style={[styles.retryButtonText, isDark && styles.textDark]}>Retry</Text>
+              </Pressable>
+            </View>
+          )}
+          
+          {isAuthenticated && user && !error ? (
             <View style={styles.profileContainer}>
               <View style={styles.profileRow}>
                 <View style={[styles.fieldLabel, isDark && styles.fieldLabelDark]}>
@@ -111,7 +127,7 @@ export default function DashboardScreen({ navigation }: DashboardScreenProps) {
                 <Text style={[styles.buttonText, isDark && styles.buttonTextDark]}>See full Expo SDK docs</Text>
               </Pressable>
             </View>
-          ) : (
+          ) : !error && (
             <Text style={[styles.loadingText, isDark && styles.textDark]}>Loading user data...</Text>
           )}
         </View>
@@ -303,5 +319,35 @@ const styles = StyleSheet.create({
   },
   textDark: {
     color: '#fff',
+  },
+  errorContainer: {
+    marginVertical: 16,
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: '#fee2e2',
+    borderWidth: 1,
+    borderColor: '#fecaca',
+  },
+  errorText: {
+    color: '#b91c1c',
+    textAlign: 'center',
+  },
+  errorTextDark: {
+    color: '#ef4444',
+  },
+  retryButton: {
+    marginTop: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    backgroundColor: '#3b82f6',
+    borderRadius: 8,
+    alignSelf: 'center',
+  },
+  retryButtonDark: {
+    backgroundColor: '#60a5fa',
+  },
+  retryButtonText: {
+    color: '#fff',
+    fontWeight: '600',
   },
 });
