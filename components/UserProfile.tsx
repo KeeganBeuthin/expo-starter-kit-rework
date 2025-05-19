@@ -5,9 +5,21 @@ import { StyleSheet, Text, useColorScheme, View } from 'react-native';
 import { ThemedText } from './ThemedText';
 import { ThemedView } from './ThemedView';
 
-export function UserProfile({ showTitle = false }) {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+interface UserProfileProps {
+  showTitle?: boolean;
+}
+
+interface UserData {
+  id: string;
+  email?: string;
+  given_name?: string;
+  family_name?: string;
+  [key: string]: any;
+}
+
+export function UserProfile({ showTitle = false }: UserProfileProps) {
+  const [user, setUser] = useState<UserData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
 
@@ -15,7 +27,7 @@ export function UserProfile({ showTitle = false }) {
     const fetchUserProfile = async () => {
       try {
         const profile = await getUserProfile();
-        setUser(profile);
+        setUser(profile as UserData);
       } catch (error) {
         console.error('Error fetching user profile:', error);
       } finally {

@@ -1,17 +1,18 @@
-// components/MainHeader.js
+// components/MainHeader.tsx
 import { useKindeAuth } from '@kinde/expo';
 import * as Linking from 'expo-linking';
 import React from 'react';
 import { Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { NativeStackHeaderProps } from '@react-navigation/native-stack';
 
-export function MainHeader({ route, navigation }) {
+export function MainHeader({ route, navigation }: NativeStackHeaderProps) {
   const insets = useSafeAreaInsets();
   const { login, register, logout, isAuthenticated } = useKindeAuth();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
 
-  const handleSignIn = async () => {
+  const handleSignIn = async (): Promise<void> => {
     try {
       await login({});
     } catch (error) {

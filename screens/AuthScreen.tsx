@@ -1,4 +1,4 @@
-// screens/AuthScreen.js
+// screens/AuthScreen.tsx
 import { useKindeAuth } from '@kinde/expo';
 import React from 'react';
 import { Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native';
@@ -9,7 +9,7 @@ export default function AuthScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
 
-  const handleSignIn = async () => {
+  const handleSignIn = async (): Promise<void> => {
     try {
       const token = await login({});
       if (token) {

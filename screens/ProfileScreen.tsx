@@ -1,4 +1,4 @@
-// screens/ProfileScreen.js
+// screens/ProfileScreen.tsx
 import {
     getCurrentOrganization,
     getPermissions,
@@ -9,12 +9,38 @@ import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, useColorScheme, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+interface UserProfile {
+  id: string;
+  email?: string;
+  given_name?: string;
+  family_name?: string;
+  [key: string]: any;
+}
+
+interface Role {
+  id: string;
+  name: string;
+  [key: string]: any;
+}
+
+interface Permission {
+  id: string;
+  name: string;
+  [key: string]: any;
+}
+
+interface Organization {
+  id: string;
+  name: string;
+  [key: string]: any;
+}
+
 export default function ProfileScreen() {
-  const [userProfile, setUserProfile] = useState(null);
-  const [roles, setRoles] = useState([]);
-  const [permissions, setPermissions] = useState([]);
-  const [organization, setOrganization] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [permissions, setPermissions] = useState<Permission[]>([]);
+  const [organization, setOrganization] = useState<Organization | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
 
@@ -28,10 +54,10 @@ export default function ProfileScreen() {
           getCurrentOrganization()
         ]);
 
-        setUserProfile(profile);
-        setRoles(userRoles || []);
-        setPermissions(userPermissions || []);
-        setOrganization(currentOrg);
+        setUserProfile(profile as UserProfile);
+        setRoles(userRoles as Role[] || []);
+        setPermissions(userPermissions as unknown as Permission[] || []);
+        setOrganization(currentOrg as unknown as Organization);
       } catch (error) {
         console.error('Error fetching user data:', error);
       } finally {

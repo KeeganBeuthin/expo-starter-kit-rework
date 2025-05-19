@@ -1,9 +1,19 @@
-// components/TopicItem.js
+// components/TopicItem.tsx
 import * as Linking from 'expo-linking';
 import React from 'react';
 import { Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native';
 
-export function TopicItem({ topic }) {
+interface Topic {
+  label: string;
+  description: string;
+  docsLink: string;
+}
+
+interface TopicItemProps {
+  topic: Topic;
+}
+
+export function TopicItem({ topic }: TopicItemProps) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
 

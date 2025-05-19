@@ -1,4 +1,4 @@
-// navigation/AppStack.js
+// navigation/AppStack.tsx
 import { useKindeAuth } from '@kinde/expo';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
@@ -8,7 +8,14 @@ import DashboardScreen from '../screens/DashboardScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import TopicsScreen from '../screens/TopicsScreen';
 
-const Stack = createNativeStackNavigator();
+type RootStackParamList = {
+  Dashboard: undefined;
+  Profile: undefined;
+  Topics: undefined;
+  Auth: undefined;
+};
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export function AppStack() {
   const { isAuthenticated } = useKindeAuth();

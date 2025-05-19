@@ -1,14 +1,36 @@
-// screens/DashboardScreen.js
+// screens/DashboardScreen.tsx
 import { useKindeAuth } from '@kinde/expo';
 import { getUserProfile } from '@kinde/expo/utils';
 import * as Linking from 'expo-linking';
 import React, { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, useColorScheme, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-export default function DashboardScreen({ navigation }) {
+type RootStackParamList = {
+  Dashboard: undefined;
+  Profile: undefined;
+  Topics: undefined;
+};
+
+type DashboardScreenProps = NativeStackScreenProps<RootStackParamList, 'Dashboard'>;
+
+interface UserProfile {
+  id: string;
+  email?: string;
+  given_name?: string;
+  family_name?: string;
+  [key: string]: any;
+}
+
+interface ContentItem {
+  title: string;
+  link: string;
+}
+
+export default function DashboardScreen({ navigation }: DashboardScreenProps) {
   const { isAuthenticated } = useKindeAuth();
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
 
@@ -16,7 +38,7 @@ export default function DashboardScreen({ navigation }) {
     const fetchUserProfile = async () => {
       try {
         const profile = await getUserProfile();
-        setUser(profile);
+        setUser(profile as UserProfile);
       } catch (error) {
         console.error('Error fetching user profile:', error);
       }
@@ -60,7 +82,7 @@ export default function DashboardScreen({ navigation }) {
                   <Text style={styles.fieldLabelText}>email</Text>
                 </View>
                 <View style={[styles.fieldValue, isDark && styles.fieldValueDark]}>
-                  <Text style={[styles.fieldValueText, isDark && styles.textDark]} numberOfLines={1}>{user.email}</Text>
+                  <Text style={[styles.fieldValueText, isDark && styles.textDark]} numberOfLines={1}>{user.email || '-'}</Text>
                 </View>
               </View>
               

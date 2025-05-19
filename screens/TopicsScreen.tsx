@@ -1,11 +1,17 @@
-// screens/TopicsScreen.js
+// screens/TopicsScreen.tsx
 import React from 'react';
 import { FlatList, StyleSheet, Text, useColorScheme, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TopicItem } from '../components/TopicItem';
 
+interface Topic {
+  label: string;
+  description: string;
+  docsLink: string;
+}
+
 // Similar to the NextJS topics data
-const topicsData = [
+const topicsData: Topic[] = [
   {
     label: "Get started",
     description: "Essential information for using and connecting to Kinde",
@@ -69,7 +75,6 @@ export default function TopicsScreen() {
         renderItem={({ item }) => <TopicItem topic={item} />}
         numColumns={1}
         contentContainerStyle={styles.listContent}
-        columnWrapperStyle={styles.columnWrapper}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
     </SafeAreaView>

@@ -1,4 +1,4 @@
-// components/KindeHeader.js
+// components/KindeHeader.tsx
 import { useKindeAuth } from '@kinde/expo';
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
@@ -8,7 +8,7 @@ export function KindeHeader() {
   const insets = useSafeAreaInsets();
   const kinde = useKindeAuth();
 
-  const handleSignIn = async () => {
+  const handleSignIn = async (): Promise<void> => {
     try {
       const token = await kinde.login({});
       if (token) {
