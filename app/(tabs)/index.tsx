@@ -7,12 +7,12 @@ import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTimeBasedTheme } from '@/context/ThemeContext';
 
 export default function HomeScreen() {
   const kinde = useKindeAuth();
   const [isAuth, setIsAuth] = useState(kinde.isAuthenticated);
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
+  const { isDark } = useTimeBasedTheme();
   const insets = useSafeAreaInsets();
   
   useEffect(() => {
@@ -25,11 +25,11 @@ export default function HomeScreen() {
 
   return (
     <ScrollView 
-      style={styles.scrollView} 
+      style={[styles.scrollView, {backgroundColor: isDark ? 'black' : 'white'}]} 
       contentContainerStyle={styles.scrollContent}
     >
-      <View style={styles.container}>
-        <ThemedText style={styles.mainHeading}>
+      <View style={[styles.container, {backgroundColor: isDark ? 'black' : 'white'}]}>
+        <ThemedText style={[styles.mainHeading, {color: isDark ? 'white' : 'black'}]}>
           Auth for{'\n'}modern{'\n'}applications
         </ThemedText>
         
