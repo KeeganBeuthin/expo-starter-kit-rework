@@ -56,6 +56,6 @@ To learn more about developing your project with Expo and Kinde, look at the fol
 ## Join the community
 
 Join our community of developers creating universal apps.
-
+- [Kinde Expo on github](https://github.com/kinde-oss/expo): View the source code for our expo sdk
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
