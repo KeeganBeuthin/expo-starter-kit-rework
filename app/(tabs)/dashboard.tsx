@@ -3,27 +3,34 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { UserProfile } from '@/components/UserProfile';
 import { useKindeAuth } from '@kinde/expo';
+import { useTimeBasedTheme } from '@/context/ThemeContext';
 import { router } from 'expo-router';
-import { useEffect } from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useEffect, useCallback } from 'react';
+import { ScrollView, StyleSheet, Pressable, ActivityIndicator, View } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function DashboardScreen() {
   const kinde = useKindeAuth();
+  const { isDark } = useTimeBasedTheme();
   const insets = useSafeAreaInsets();
   
-  // Check authentication on component mount and when auth state changes
-  useEffect(() => {
-    if (!kinde.isAuthenticated) {
-      // Redirect to home if not authenticated
-      router.replace('/');
-    }
-  }, [kinde.isAuthenticated]);
-
-  // Don't render anything while checking auth
-  if (!kinde.isAuthenticated) {
-    return null;
-  }
+  // Safe authentication check with useFocusEffect for better navigation handling
+  useFocusEffect(
+    useCallback(() => {
+      if (kinde?.isAuthenticated === false) {
+        const timer = setTimeout(() => {
+          try {
+            router.replace('/');
+          } catch (error) {
+            console.error('Navigation error:', error);
+          }
+        }, 100);
+        
+        return () => clearTimeout(timer);
+      }
+    }, [kinde?.isAuthenticated])
+  );
 
   const handleLogout = async () => {
     try {
@@ -33,23 +40,41 @@ export default function DashboardScreen() {
     }
   };
 
-  // Using a similar structure to the index page that works properly
+  // Show loading state while checking authentication
+  if (kinde?.isLoading || kinde?.isAuthenticated === undefined) {
+    return (
+      <SafeAreaView style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="white" />
+        <ThemedText style={styles.loadingText}>Loading...</ThemedText>
+      </SafeAreaView>
+    );
+  }
+
+  // Don't render anything if not authenticated
+  if (!kinde.isAuthenticated) {
+    return null;
+  }
+
+  // Using the original structure that works properly
   return (
     <ScrollView 
       style={styles.scrollView}
-      contentContainerStyle={styles.scrollContent}
+      contentContainerStyle={[
+        styles.scrollContent,
+        { paddingBottom: insets.bottom + 20 }
+      ]}
     >
-      <ThemedView style={styles.container}>
+      <ThemedView style={[styles.container, { width: '100%' }]}>
         <ThemedText style={styles.mainHeading}>
           Your authentication{'\n'}is all sorted!
         </ThemedText>
         
-        <ThemedView style={styles.card}>
+        <ThemedView style={[styles.card, { width: '100%' }]}>
           <ThemedText style={styles.cardTitle}>User Profile</ThemedText>
           <UserProfile showTitle={false} />
         </ThemedView>
         
-        <ThemedView style={styles.card}>
+        <ThemedView style={[styles.card, { width: '100%' }]}>
           <ThemedText style={styles.cardTitle}>Get started with Kinde</ThemedText>
           <ThemedText style={styles.cardText}>
             Now that you're authenticated, you can explore all the features Kinde has to offer.
@@ -69,6 +94,15 @@ export default function DashboardScreen() {
             </ThemedView>
           </ThemedView>
         </ThemedView>
+        
+        <ThemedView style={styles.logoutButtonContainer}>
+          <Pressable 
+            style={styles.logoutButton}
+            onPress={handleLogout}
+          >
+            <ThemedText style={styles.logoutButtonText}>Sign Out</ThemedText>
+          </Pressable>
+        </ThemedView>
       </ThemedView>
     </ScrollView>
   );
@@ -80,7 +114,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
   },
   scrollContent: {
-    paddingTop: 50, // Reduced from 150 to 100
+    paddingTop: 50,
     paddingBottom: 40,
   },
   container: {
@@ -94,7 +128,7 @@ const styles = StyleSheet.create({
     color: 'white',
     textAlign: 'center',
     marginBottom: 40,
-    lineHeight: 44, // Ensuring proper line height
+    lineHeight: 44,
   },
   card: {
     width: '100%',
@@ -153,6 +187,17 @@ const styles = StyleSheet.create({
   logoutButtonText: {
     color: 'black',
     fontWeight: '600',
+    fontSize: 16,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'black',
+  },
+  loadingText: {
+    color: 'white',
+    marginTop: 16,
     fontSize: 16,
   }
 });

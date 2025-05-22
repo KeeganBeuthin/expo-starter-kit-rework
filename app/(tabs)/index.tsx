@@ -53,18 +53,22 @@ export default function HomeScreen() {
           </ThemedText>
           
           <ThemedText style={styles.cardText}>
-            B. Add your <ThemedText style={styles.boldText}>callback URLs</ThemedText> in the relevant fields. For example:
+            B. Add your <ThemedText style={styles.boldText}>callback URLs</ThemedText> in the relevant fields. You'll need to include your development URL with the following patterns:
           </ThemedText>
           
           <View style={styles.codeBlock}>
-            <ThemedText style={styles.codeText}>exp://localhost:8081/--/</ThemedText>
-            <ThemedText style={styles.codeText}>exp://192.168.X.X:8081/--/</ThemedText>
+            <ThemedText style={styles.codeText}>[scheme]://[host]:[port]/--/</ThemedText>
+            <ThemedText style={styles.codeText}>Example: exp://localhost:19000/--/</ThemedText>
           </View>
           
           <View style={styles.codeBlock}>
-            <ThemedText style={styles.codeText}>exp://localhost:8081</ThemedText>
-            <ThemedText style={styles.codeText}>exp://192.168.X.X:8081</ThemedText>
+            <ThemedText style={styles.codeText}>[scheme]://[host]:[port]</ThemedText>
+            <ThemedText style={styles.codeText}>Example: exp://localhost:19000</ThemedText>
           </View>
+          
+          <ThemedText style={styles.cardText}>
+            Note: The port may vary (common values: 8081, 19000, 19006). Check your Expo dev server output for the correct URL.
+          </ThemedText>
           
           <ThemedText style={styles.cardText}>
             C. Select <ThemedText style={styles.boldText}>Save</ThemedText>.
