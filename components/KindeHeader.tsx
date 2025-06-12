@@ -30,6 +30,14 @@ export function KindeHeader() {
     }
   };
 
+    const handleAccount = async () => {
+      try {
+        await kinde.portal();
+      } catch (error) {
+        console.error('Generate portal URL error:', error);
+      }
+    };
+
   const handleLogout = async () => {
     try {
       await kinde.logout({ revokeToken: true });
@@ -57,9 +65,17 @@ export function KindeHeader() {
             </Pressable>
           </>
         ) : (
-          <Pressable onPress={handleLogout} style={styles.registerButton}>
-            <Text style={styles.registerText}>Log out</Text>
-          </Pressable>
+          <>
+            <Pressable
+              style={styles.signInButton}
+              onPress={handleAccount}
+            >
+              <Text style={styles.signInText}>Account</Text>
+            </Pressable>
+            <Pressable onPress={handleLogout} style={styles.registerButton}>
+              <Text style={styles.registerText}>Log outs</Text>
+            </Pressable>
+          </>
         )}
       </View>
     </View>
